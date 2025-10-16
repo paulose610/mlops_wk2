@@ -37,10 +37,13 @@ jobs:
       - name: Authenticate to GCP
         run: |
           echo "$GCP_CREDENTIALS_JSON" > /tmp/gcp-key.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-key.json
           gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
           gcloud config set project winged-quanta-472908-n1
 
       - name: Pull data and model from DVC remote
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp-key.json
         run: dvc pull
 
       - name: Run sanity tests (pytest)
