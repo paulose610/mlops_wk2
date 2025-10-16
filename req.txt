@@ -2,3 +2,5 @@ python-dotenv
 google-cloud-aiplatform
 pandas
 scikit-learn
+dvc
+dvc[gcs]

@@ -13,7 +13,7 @@ X = df.iloc[:, :-1]  # all columns except last
 y = df.iloc[:, -1]   # last column
 
 # Split into train and test sets (e.g., 80% train, 20% test)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify = y)
 
 # Save the splits as CSV
 X_train.to_csv("data/X_train.csv", index=False)

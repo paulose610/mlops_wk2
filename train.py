@@ -19,8 +19,8 @@ clf = DecisionTreeClassifier(max_depth=2, min_samples_split=10, random_state=42)
 clf.fit(X_train, y_train)
 
 # Evaluate
-y_pred = clf.predict(X_train)
-acc = accuracy_score(y_train, y_pred)
+y_pred = clf.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
 print(f"Accuracy on train set: {acc:.4f}")
 
 # Save the model using joblib

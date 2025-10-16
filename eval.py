@@ -13,8 +13,9 @@ eval_path = os.path.join(script_dir, "metrics.csv")
 model = load(model_path)
 
 # Load test data
-X_test = pd.read_csv(os.path.join(data_path, "X_test.csv"))
-y_test = pd.read_csv(os.path.join(data_path, "y_test.csv")).values.ravel()
+test_data = pd.read_csv(os.path.join(data_path, "validate.csv")) 
+y_test = test_data[['species']].values.ravel()
+X_test = test_data.drop('species',axis=1)
 
 # Predict
 y_pred = model.predict(X_test)
@@ -29,4 +30,3 @@ metrics = {
 
 # Save metrics to CSV
 pd.DataFrame([metrics]).to_csv(eval_path, index=False)
-
