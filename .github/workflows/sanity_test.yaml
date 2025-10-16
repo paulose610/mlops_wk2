@@ -30,14 +30,13 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r req.txt
-          pip install dvc[gcs]
           pip install pytest
 
       - name: Authenticate to GCP
         run: |
           echo "$GCP_CREDENTIALS_JSON" > /tmp/gcp-key.json
           gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-          gcloud config set project <YOUR_GCP_PROJECT_ID>
+          gcloud config set project winged-quanta-472908-n1
 
       - name: Pull data and model from DVC remote
         run: dvc pull
