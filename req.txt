@@ -3,4 +3,4 @@ google-cloud-aiplatform
 pandas
 scikit-learn
 dvc
-dvc[gcs]
+dvc-gs
