@@ -3,8 +3,8 @@ from sklearn.model_selection import train_test_split
 import os
 
 # Path to your CSV
-data_path = "data/data.csv"
-
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_path = os.path.join(script_dir, "../data")
 # Load the dataset
 df = pd.read_csv(data_path)
 

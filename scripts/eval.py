@@ -5,9 +5,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 # Paths
 script_dir = os.path.dirname(os.path.abspath(__file__))
-data_path = os.path.join(script_dir, "data")
-model_path = os.path.join(script_dir, "model.joblib")
-eval_path = os.path.join(script_dir, "metrics.csv")
+print(script_dir)
+data_path = os.path.join(script_dir, "../data")
+model_path = os.path.join(script_dir, "../model.joblib")
+eval_path = os.path.join(script_dir, "../metrics.csv")
 
 # Load model
 model = load(model_path)

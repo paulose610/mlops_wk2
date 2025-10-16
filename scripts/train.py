@@ -6,14 +6,15 @@ from datetime import datetime
 import os
 
 # Load the data
-data_path = "data"  # Adjust if your CSVs are in a different folder
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_path = os.path.join(script_dir, "../data")
 X_train = pd.read_csv(os.path.join(data_path, "X_train.csv"))
 X_test = pd.read_csv(os.path.join(data_path, "X_test.csv"))
 y_train = pd.read_csv(os.path.join(data_path, "y_train.csv")).values.ravel()  # flatten
 y_test = pd.read_csv(os.path.join(data_path, "y_test.csv")).values.ravel()
 
 # Initialize the Decision Tree classifier with some simple hyperparameters
-clf = DecisionTreeClassifier(max_depth=2, min_samples_split=10, random_state=42)
+clf = DecisionTreeClassifier(max_depth=3, min_samples_split=10, random_state=42)
 
 # Train the model
 clf.fit(X_train, y_train)
