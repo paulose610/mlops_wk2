@@ -14,7 +14,7 @@ y_train = pd.read_csv(os.path.join(data_path, "y_train.csv")).values.ravel()  # 
 y_test = pd.read_csv(os.path.join(data_path, "y_test.csv")).values.ravel()
 
 # Initialize the Decision Tree classifier with some simple hyperparameters
-clf = DecisionTreeClassifier(max_depth=1, min_samples_split=10, random_state=42)
+clf = DecisionTreeClassifier(max_depth=3, min_samples_split=10, random_state=42)
 
 # Train the model
 clf.fit(X_train, y_train)
