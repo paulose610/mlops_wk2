@@ -1,0 +1,63 @@
+name: Sanity Test
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sanity_check:
+    runs-on: ubuntu-latest
+
+    env:
+      REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GCP_CREDENTIALS_JSON: ${{ secrets.GCP_CREDENTIALS_JSON }}
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Set up CML
+        uses: iterative/setup-cml@v2
+
+      - name: Install dependencies
+        run: |
+          pip install -r req.txt
+          pip install dvc[gcs]
+          pip install pytest
+
+      - name: Authenticate to GCP
+        run: |
+          echo "$GCP_CREDENTIALS_JSON" > /tmp/gcp-key.json
+          gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+          gcloud config set project <YOUR_GCP_PROJECT_ID>
+
+      - name: Pull data and model from DVC remote
+        run: dvc pull
+
+      - name: Run sanity tests (pytest)
+        run: |
+          pytest tests/ --maxfail=1 --disable-warnings -q > test_output.txt || true
+
+      - name: Create and publish CML report
+        run: |
+          echo "### 🧪 Sanity Test Report" > report.md
+          echo "" >> report.md
+          echo "#### 🧩 Unit Test Results" >> report.md
+          echo '```\n' >> report.md
+          cat test_output.txt >> report.md
+          echo '\n```' >> report.md
+
+          echo "" >> report.md
+          echo "#### 📊 Model Metrics" >> report.md
+          if [ -f metrics.csv ]; then cat metrics.csv >> report.md; else echo "No metrics found." >> report.md; fi
+
+          cml comment create --publish report.md
+
