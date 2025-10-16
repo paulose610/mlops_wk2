@@ -48,15 +48,15 @@ jobs:
 
       - name: Create and publish CML report
         run: |
-          echo "### 🧪 Sanity Test Report" > report.md
+          echo "### Sanity Test Report" > report.md
           echo "" >> report.md
-          echo "#### 🧩 Unit Test Results" >> report.md
+          echo "#### Test Results" >> report.md
           echo '```\n' >> report.md
           cat test_output.txt >> report.md
           echo '\n```' >> report.md
 
           echo "" >> report.md
-          echo "#### 📊 Model Metrics" >> report.md
+          echo "#### Model Metrics" >> report.md
           if [ -f metrics.csv ]; then cat metrics.csv >> report.md; else echo "No metrics found." >> report.md; fi
 
           cml comment create --publish report.md
