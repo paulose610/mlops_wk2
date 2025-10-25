@@ -4,3 +4,5 @@ pandas
 scikit-learn
 dvc
 dvc-gs
+mlflow
+ipykernel

@@ -4,7 +4,7 @@ import os
 
 # Path to your CSV
 script_dir = os.path.dirname(os.path.abspath(__file__))
-data_path = os.path.join(script_dir, "../data")
+data_path = os.path.join(script_dir, "../data/data.csv")
 # Load the dataset
 df = pd.read_csv(data_path)
 
