@@ -49,9 +49,11 @@ jobs:
         run: dvc pull
 
       - name: Run sanity tests (pytest)
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp-key.json
         run: |
           pytest tests/ --maxfail=1 --disable-warnings -q > test_output.txt || true
-
+          
       - name: Create and publish CML report
         run: |
           echo "### Sanity Test Report" > report.md
