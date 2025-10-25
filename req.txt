@@ -6,3 +6,4 @@ dvc
 dvc-gs
 mlflow
 ipykernel
+pytest

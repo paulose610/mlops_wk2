@@ -63,7 +63,8 @@ jobs:
 
           echo "" >> report.md
           echo "#### Model Metrics" >> report.md
-          if [ -f metrics.csv ]; then cat metrics.csv >> report.md; else echo "No metrics found." >> report.md; fi
+          
+          if [ -f metadata/metrics.csv ]; then cat metadata/metrics.csv >> report.md; else echo "No metrics found." >> report.md; fi
 
           cml comment create --publish report.md
 
