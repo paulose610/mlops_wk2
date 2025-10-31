@@ -1,8 +1,5 @@
 # Week 6 → Model Deployment (Kubernetes + FastAPI)
 
-## Github Link
-Repository: [paulose610/mlops_wk2 (dev branch)](https://github.com/paulose610/mlops_wk2/tree/dev)
-
 ## Helper Scripts
 
 - **cleanup.sh**  
