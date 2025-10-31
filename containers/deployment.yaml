@@ -12,6 +12,7 @@ spec:
       labels:
         app: iris-model
     spec:
+      serviceAccountName: iris-ksa
       containers:
         - name: iris-model
           image: us-central1-docker.pkg.dev/winged-quanta-472908-n1/iris-repo/iris-model:v$MODEL_VERSION
