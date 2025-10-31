@@ -12,7 +12,7 @@ mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 client = mlflow.tracking.MlflowClient()
 versions = client.search_model_versions(f"name='{MODEL_NAME}'")
 latest_version = max(versions, key=lambda v: int(v.version)).version
-print(f"📦 Latest model version: {latest_version}")
+print(f"Latest model version: {latest_version}")
 
 # --- 2. Build & push Docker image (bakes metadata here) ---
 tag = f"{IMAGE_BASE}:v{latest_version}"
@@ -34,4 +34,4 @@ subprocess.run(
 )
 subprocess.run(["kubectl", "apply", "-f", "service.yaml"], check=True)
 
-print(f"✅ Deployed model {MODEL_NAME} version {latest_version} with image tag v{latest_version}")
+print(f"Deployed model {MODEL_NAME} version {latest_version} with image tag v{latest_version}")

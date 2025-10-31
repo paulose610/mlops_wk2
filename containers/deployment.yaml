@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: iris-model-v${MODEL_VERSION}   # 👈 unique per version
+  name: iris-model-v${MODEL_VERSION}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: iris-model
-      version: v${MODEL_VERSION}       # 👈 distinguish versions
+      version: v${MODEL_VERSION}
   template:
     metadata:
       labels:

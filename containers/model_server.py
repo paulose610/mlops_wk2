@@ -15,9 +15,9 @@ try:
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     model_uri = f"models:/{MODEL_NAME}/{MODEL_VERSION}"
     model = mlflow.sklearn.load_model(model_uri)
-    print(f"✅ Loaded model '{MODEL_NAME}' (version {MODEL_VERSION})")
+    print(f"Loaded model '{MODEL_NAME}' (version {MODEL_VERSION})")
 except Exception as e:
-    print(f"❌ Failed to load model: {e}")
+    print(f"Failed to load model: {e}")
 
 class IrisInput(BaseModel):
     sepal_length: float
