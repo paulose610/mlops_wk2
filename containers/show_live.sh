@@ -5,7 +5,7 @@ PROJECT_ID="winged-quanta-472908-n1"
 REGION="us-central1"
 REPO="iris-repo"
 
-echo "📦 Deployments:"
+echo "Deployments:"
 kubectl get deployments
 
 echo -e "\n🔹 Services with Model Info:"
@@ -27,13 +27,13 @@ for svc in $(kubectl get svc -o jsonpath='{.items[*].metadata.name}'); do
     echo "Service: $svc | IP: $ext_ip | Model: $model_name | Version: v$model_ver | Port: $port"
 done
 
-echo -e "\n🧩 Pods:"
+echo -e "\nPods:"
 kubectl get pods
 
-echo -e "\n🗂️ Artifact Registry images:"
+echo -e "\nArtifact Registry images:"
 gcloud artifacts docker images list "$REGION-docker.pkg.dev/$PROJECT_ID/$REPO"
 
-echo -e "\n🐳 Local Docker images:"
+echo -e "\nLocal Docker images:"
 docker images | grep "$REPO" || echo "No local images found."
 
-echo -e "\n✅ Listing complete."
+echo -e "\nListing complete."

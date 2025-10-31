@@ -1,21 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: iris-model-deployment
+  name: iris-model-v${MODEL_VERSION}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: iris-model
+      version: v${MODEL_VERSION}
   template:
     metadata:
       labels:
         app: iris-model
+        version: v${MODEL_VERSION}
     spec:
       serviceAccountName: iris-ksa
       containers:
         - name: iris-model
-          image: us-central1-docker.pkg.dev/winged-quanta-472908-n1/iris-repo/iris-model:v$MODEL_VERSION
+          image: us-central1-docker.pkg.dev/winged-quanta-472908-n1/iris-repo/iris-model:v${MODEL_VERSION}
           ports:
             - containerPort: 8200
           env:
