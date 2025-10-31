@@ -17,6 +17,7 @@ jobs:
       GCP_REGION: us-central1
       GKE_CLUSTER: gke-week6-iris-cluster
       GCP_CREDENTIALS_JSON: ${{ secrets.GCP_CREDENTIALS_JSON }}
+      REPO_URI: us-central1-docker.pkg.dev/winged-quanta-472908-n1/iris-repo
 
     steps:
       - name: Checkout code
@@ -30,20 +31,25 @@ jobs:
       - name: Install dependencies
         run: pip install -r containers/cd_req.txt
 
-      # ✅ Modern authentication step
+      # ✅ Authenticate to GCP
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS_JSON }}
 
-      # ✅ Set up Cloud SDK and GKE plugin
+      # ✅ Set up Cloud SDK + GKE plugin
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.GCP_PROJECT_ID }}
           install_components: 'gke-gcloud-auth-plugin'
 
-      # ✅ Fetch cluster credentials (for kubectl)
+      # ✅ Configure Docker to use gcloud credentials for Artifact Registry
+      - name: Configure Docker auth for Artifact Registry
+        run: |
+          gcloud auth configure-docker $GCP_REGION-docker.pkg.dev --quiet
+
+      # ✅ Get GKE credentials
       - name: Get GKE credentials
         uses: google-github-actions/get-gke-credentials@v2
         with:
@@ -51,7 +57,11 @@ jobs:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GCP_REGION }}
 
-      # ✅ Deploy step
+      # ✅ (Optional sanity check)
+      - name: Verify GKE connectivity
+        run: kubectl get nodes
+
+      # ✅ Deploy latest model
       - name: Deploy latest model to GKE
         working-directory: ./containers
         run: python deploy_latest.py
