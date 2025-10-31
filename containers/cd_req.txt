@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+mlflow
+scikit-learn
+pandas
+numpy
+joblib
+pydantic
+python-dotenv
+requests
+loguru
+google-cloud-storage
+google-cloud-artifact-registry
+tqdm
+pyyaml
