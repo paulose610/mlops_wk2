@@ -64,3 +64,7 @@ def test_model_performance():
     # Save metrics for report
     pd.DataFrame([metrics]).to_csv(metrics_path, index=False)
     print("Metrics saved successfully:", metrics)
+
+if __name__ == "__main__":
+    test_get_latest_model()
+    test_model_performance()
