@@ -28,7 +28,7 @@ jobs:
           python-version: "3.9"
 
       - name: Install dependencies
-        run: pip install mlflow google-cloud-storage
+        run: pip install -r container/cd_req.txt
 
       - name: Authenticate to GCP
         run: |
@@ -39,5 +39,5 @@ jobs:
           gcloud container clusters get-credentials $GKE_CLUSTER --region $GCP_REGION
 
       - name: Deploy latest model to GKE
-        run: python deploy_latest.py
+        run: python container/deploy_latest.py
 
