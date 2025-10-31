@@ -32,6 +32,10 @@ subprocess.run(
     shell=True,
     check=True
 )
-subprocess.run(["kubectl", "apply", "-f", "service.yaml"], check=True)
+subprocess.run(
+    f"env MODEL_NAME={MODEL_NAME} MODEL_VERSION={latest_version} envsubst < service.yaml | kubectl apply -f -",
+    shell=True,
+    check=True
+)
 
 print(f"Deployed model {MODEL_NAME} version {latest_version} with image tag v{latest_version}")
