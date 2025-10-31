@@ -1,0 +1,43 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      GCP_PROJECT_ID: winged-quanta-472908-n1
+      GCP_REGION: us-central1
+      GKE_CLUSTER: gke-week6-iris-cluster
+      GCP_CREDENTIALS_JSON: ${{ secrets.GCP_CREDENTIALS_JSON }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: pip install mlflow google-cloud-storage
+
+      - name: Authenticate to GCP
+        run: |
+          echo "$GCP_CREDENTIALS_JSON" > /tmp/gcp-key.json
+          gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+          gcloud config set project $GCP_PROJECT_ID
+          gcloud auth configure-docker $GCP_REGION-docker.pkg.dev --quiet
+          gcloud container clusters get-credentials $GKE_CLUSTER --region $GCP_REGION
+
+      - name: Deploy latest model to GKE
+        run: python deploy_latest.py
+

@@ -5,43 +5,33 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from mlflow.tracking import MlflowClient
 import mlflow
 
-mlflow.set_tracking_uri("http://136.113.100.212:8100")
+mlflow.set_tracking_uri("http://34.66.196.132:8100")
 client = MlflowClient(mlflow.get_tracking_uri())
 
 # Global variable
 best_model_uri = None
 
 
-def test_get_best_model():
-    global best_model_uri  # ensure it updates for the next test
+def test_get_latest_model():
+    global best_model_uri  # keep name same if other tests depend on it
 
     model_name = "IRIS-classifier-dt"
     versions = client.search_model_versions(f"name='{model_name}'")
 
-    best_version = None
-    best_accuracy = 0
-
-    for v in versions:
-        run_id = v.run_id
-        run = client.get_run(run_id)
-        acc = run.data.metrics.get("accuracy")
-
-        if acc is not None and acc > best_accuracy:
-            best_accuracy = acc
-            best_version = v
-
-    if best_version:
-        print(f"Best model version: {best_version.version}")
-        print(f"Run ID: {best_version.run_id}")
-        print(f"Accuracy: {best_accuracy}")
-        print(f"Stage: {best_version.current_stage}")
-
-        # Correctly store for next test
-        best_model_uri = f"models:/{model_name}/{best_version.version}"
-        print(f"Best model URI: {best_model_uri}")
-    else:
+    if not versions:
         print("No versions found for this model.")
         assert False, "No registered models found!"
+
+    # Get the latest version (highest version number)
+    latest_version = max(versions, key=lambda v: int(v.version))
+
+    print(f"Latest model version: {latest_version.version}")
+    print(f"Run ID: {latest_version.run_id}")
+    print(f"Stage: {latest_version.current_stage}")
+
+    best_model_uri = f"models:/{model_name}/{latest_version.version}"
+    print(f"Latest model URI: {best_model_uri}")
+
 
 
 def test_model_performance():
