@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -30,29 +30,28 @@ jobs:
       - name: Install dependencies
         run: pip install -r containers/cd_req.txt
 
-      - name: Authenticate to GCP
-        run: |
-          echo "$GCP_CREDENTIALS_JSON" > /tmp/gcp-key.json
-          gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-          gcloud config set project $GCP_PROJECT_ID
-          gcloud auth configure-docker $GCP_REGION-docker.pkg.dev --quiet
-          gcloud container clusters get-credentials $GKE_CLUSTER --region $GCP_REGION
+      # ✅ Modern authentication step
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS_JSON }}
 
+      # ✅ Set up Cloud SDK and GKE plugin
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.GCP_PROJECT_ID }}
-          service_account_key: ${{ env.GCP_CREDENTIALS_JSON }}
-          export_default_credentials: true
+          install_components: 'gke-gcloud-auth-plugin'
 
+      # ✅ Fetch cluster credentials (for kubectl)
       - name: Get GKE credentials
-        uses: google-github-actions/get-gke-credentials@v1
+        uses: google-github-actions/get-gke-credentials@v2
         with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GCP_REGION }}
 
-
+      # ✅ Deploy step
       - name: Deploy latest model to GKE
         working-directory: ./containers
         run: python deploy_latest.py
-
