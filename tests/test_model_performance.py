@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from mlflow.tracking import MlflowClient
 import mlflow
 
-mlflow.set_tracking_uri("http://34.66.196.132:8100")
+mlflow.set_tracking_uri("http://136.112.91.129:8100")
 client = MlflowClient(mlflow.get_tracking_uri())
 
 # Global variable
