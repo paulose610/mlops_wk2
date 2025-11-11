@@ -2,7 +2,7 @@ import mlflow
 import subprocess
 
 # --- Configuration ---
-MLFLOW_TRACKING_URI = "http://34.66.196.132:8100"
+MLFLOW_TRACKING_URI = "http://136.119.175.182:8100"
 MODEL_NAME = "IRIS-classifier-dt"
 IMAGE_BASE = "us-central1-docker.pkg.dev/winged-quanta-472908-n1/iris-repo/iris-model"
 

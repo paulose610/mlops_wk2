@@ -4,7 +4,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-MLFLOW_TRACKING_URI = "http://34.66.196.132:8100"
+MLFLOW_TRACKING_URI = "http://136.119.175.182:8100"
 MODEL_NAME = os.getenv("MODEL_NAME", "IRIS-classifier-dt")
 MODEL_VERSION = os.getenv("MODEL_VERSION", "1")
 
