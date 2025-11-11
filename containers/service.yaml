@@ -5,7 +5,8 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: iris-model-v${MODEL_VERSION}
+    app: iris-model
+    version: v${MODEL_VERSION}
   ports:
     - protocol: TCP
       port: 8200

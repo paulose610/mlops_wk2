@@ -6,9 +6,9 @@ REGION="us-central1"
 REPO="iris-repo"
 IMAGE="iris-model"
 
-echo "🧹 Deleting Kubernetes deployment and service..."
-kubectl delete deployment iris-model-deployment --ignore-not-found
-kubectl delete svc iris-model-service --ignore-not-found
+echo "🧹 Deleting Kubernetes deployments and services..."
+kubectl delete deployment -l app=iris-model --ignore-not-found
+kubectl delete svc -l app=iris-model --ignore-not-found
 
 echo "🧹 Deleting all images from Artifact Registry..."
 gcloud artifacts docker images list $REGION-docker.pkg.dev/$PROJECT_ID/$REPO \
