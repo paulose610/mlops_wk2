@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: iris-model-v${MODEL_VERSION}
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: iris-model
