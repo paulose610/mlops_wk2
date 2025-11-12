@@ -30,3 +30,32 @@
 
 - **post.lua**
   file for stress testing.
+
+
+# Stress Test Results Summary
+
+## Test 1 — 2000 Concurrent Connections
+Running 5m test @ http://35.193.193.246:80/predict
+Threads: 4, Connections: 2000
+
+- Average Latency: 1.27s
+- Std Dev: 456.90ms
+- Max Latency: 2.80s
+- Requests per Second: 51.43
+- Total Requests: 22,637 in 5.00m
+- Socket Errors: connect 0, read 8236, write 6762377, timeout 11615
+- Transfer/sec: 16.87KB
+
+---
+
+## Test 2 — 1000 Concurrent Connections
+Running 5m test @ http://35.193.193.246:80/predict
+Threads: 4, Connections: 1000
+
+- Average Latency: 1.25s
+- Std Dev: 468.07ms
+- Max Latency: 2.08s
+- Requests per Second: 61.60
+- Total Requests: 42,059 in 5.00m
+- Socket Errors: connect 0, read 6326, write 1734, timeout 118
+- Transfer/sec: 31.55KB
