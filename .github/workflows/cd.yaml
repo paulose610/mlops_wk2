@@ -26,7 +26,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.11"
 
       - name: Install dependencies
         run: pip install -r containers/cd_req.txt
@@ -61,7 +61,50 @@ jobs:
       - name: Verify GKE connectivity
         run: kubectl get nodes
 
-      # Deploy latest model
-      - name: Deploy latest model to GKE
+       # Deploy latest model to GKE
+      - name: Deploy latest model
+        id: deploy
         working-directory: ./containers
-        run: python deploy_latest.py
+        run: |
+          VERSION=$(python deploy_latest.py | tee /dev/stderr | grep 'MODEL_VERSION=' | cut -d'=' -f2)
+          echo "MODEL_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Captured model version: $VERSION"
+
+      # Wait for pods to be ready
+      - name: Wait for pods to become ready
+        run: |
+          kubectl rollout status deployment/iris-model-v${MODEL_VERSION} --timeout=180s
+
+      # Wait for service to get external IP
+      - name: Wait for deployed service to be ready and get IP
+        run: |
+          echo "⏳ Waiting for iris-model-v${MODEL_VERSION}-service external IP..."
+          SERVICE_NAME="iris-model-v${MODEL_VERSION}-service"
+
+          for i in {1..30}; do
+            IP=$(kubectl get svc $SERVICE_NAME -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+            if [ -n "$IP" ]; then
+              echo "Service $SERVICE_NAME ready with IP: $IP"
+              echo "SERVICE_IP=$IP" >> $GITHUB_ENV
+              break
+            fi
+            echo "Waiting for IP... ($i/30)"
+            sleep 10
+          done
+
+          if [ -z "$IP" ]; then
+            echo "Timeout waiting for service external IP"
+            kubectl describe svc $SERVICE_NAME
+            exit 1
+          fi
+
+      # Install wrk for load testing
+      - name: Install wrk
+        run: sudo apt-get update && sudo apt-get install -y wrk
+
+      # Stress test (5-minute load)
+      - name: Stress Test Model API
+        working-directory: ./benchmark
+        run: |
+          echo "🚀 Running stress test on http://$SERVICE_IP/predict"
+          wrk -t4 -c200 -d5m -s post.lua http://$SERVICE_IP/predict

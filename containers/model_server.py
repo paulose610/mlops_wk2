@@ -2,13 +2,13 @@ import os
 import time
 import json
 import logging
+import traceback
 import mlflow
 import pandas as pd
+import mlflow.sklearn
 from fastapi import FastAPI, Request, HTTPException, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-
-# ---------- OpenTelemetry Imports ----------
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -21,16 +21,21 @@ span_processor = BatchSpanProcessor(CloudTraceSpanExporter())
 trace.get_tracer_provider().add_span_processor(span_processor)
 
 # ---------- Structured JSON Logging ----------
+class JsonFormatter(logging.Formatter):
+    def format(self, record):
+        log_entry = {
+            "severity": record.levelname,
+            "message": record.getMessage(),
+            "timestamp": self.formatTime(record, self.datefmt)
+        }
+        if record.exc_info:
+            log_entry["exception_trace"] = self.formatException(record.exc_info)
+        return json.dumps(log_entry)
+
 logger = logging.getLogger("iris-ml-service")
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
-
-formatter = logging.Formatter(json.dumps({
-    "severity": "%(levelname)s",
-    "message": "%(message)s",
-    "timestamp": "%(asctime)s"
-}))
-handler.setFormatter(formatter)
+handler.setFormatter(JsonFormatter())
 logger.addHandler(handler)
 
 # ---------- FastAPI Initialization ----------
@@ -46,41 +51,40 @@ app_state = {"is_ready": False, "is_alive": True}
 
 @app.on_event("startup")
 async def startup_event():
-    """Simulate model load and set readiness flag."""
     global model
     try:
         mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
         model_uri = f"models:/{MODEL_NAME}/{MODEL_VERSION}"
         model = mlflow.sklearn.load_model(model_uri)
-        logger.info(f"Loaded model '{MODEL_NAME}' version {MODEL_VERSION}")
+        logger.info({
+            "event": "model_load_success",
+            "model_name": MODEL_NAME,
+            "model_version": MODEL_VERSION,
+            "status": "ready"
+        })
         app_state["is_ready"] = True
     except Exception as e:
-        logger.exception(json.dumps({
+        logger.error({
             "event": "model_load_error",
             "error": str(e)
-        }))
+        }, exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to load model")
 
 # ---------- Health Probes ----------
 @app.get("/live_check", tags=["Probe"])
 async def liveness_probe():
-    if app_state["is_alive"]:
-        return {"status": "alive"}
-    return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return {"status": "alive"} if app_state["is_alive"] else Response(status_code=500)
 
 @app.get("/ready_check", tags=["Probe"])
 async def readiness_probe():
-    if app_state["is_ready"]:
-        return {"status": "ready"}
-    return Response(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+    return {"status": "ready"} if app_state["is_ready"] else Response(status_code=503)
 
 # ---------- Request Timing Middleware ----------
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
-    duration = round((time.time() - start_time) * 1000, 2)
-    response.headers["X-Process-Time-ms"] = str(duration)
+    response.headers["X-Process-Time-ms"] = str(round((time.time() - start_time) * 1000, 2))
     return response
 
 # ---------- Global Exception Handler ----------
@@ -88,12 +92,12 @@ async def add_process_time_header(request: Request, call_next):
 async def exception_handler(request: Request, exc: Exception):
     span = trace.get_current_span()
     trace_id = format(span.get_span_context().trace_id, "032x")
-    logger.exception(json.dumps({
+    logger.error({
         "event": "unhandled_exception",
         "trace_id": trace_id,
         "path": str(request.url),
         "error": str(exc)
-    }))
+    }, exc_info=True)
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal Server Error", "trace_id": trace_id},
@@ -116,33 +120,27 @@ def root():
 async def predict(input: IrisInput, request: Request):
     if model is None:
         raise HTTPException(status_code=500, detail="Model not loaded.")
-    
     with tracer.start_as_current_span("model_inference") as span:
         start_time = time.time()
         trace_id = format(span.get_span_context().trace_id, "032x")
-
         try:
-            input_data = input.dict()
-            input_df = pd.DataFrame([input_data])
+            columns = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
+            input_df = pd.DataFrame([[getattr(input, c) for c in columns]], columns=columns)
             prediction = model.predict(input_df)[0]
             latency = round((time.time() - start_time) * 1000, 2)
-
-            log_entry = {
+            logger.info({
                 "event": "prediction",
                 "trace_id": trace_id,
-                "input": input_data,
+                "input": input.dict(),
                 "prediction": str(prediction),
                 "latency_ms": latency,
                 "status": "success"
-            }
-            logger.info(json.dumps(log_entry))
-
-            return {"predicted_species": prediction, "trace_id": trace_id}
-
+            })
+            return {"predicted_species": str(prediction), "trace_id": trace_id}
         except Exception as e:
-            logger.exception(json.dumps({
+            logger.error({
                 "event": "prediction_error",
                 "trace_id": trace_id,
                 "error": str(e)
-            }))
+            }, exc_info=True)
             raise HTTPException(status_code=500, detail="Prediction failed")

@@ -37,3 +37,4 @@ for manifest in ["deployment.yaml", "service.yaml", "hpa.yaml"]:
 
 print(f"\n✅ Deployed model '{MODEL_NAME}' version {latest_version} with image tag v{latest_version}")
 print("✅ Deployment, Service, and HPA applied successfully.")
+print(f"MODEL_VERSION={latest_version}")
