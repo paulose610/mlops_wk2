@@ -1,4 +1,4 @@
-# Week 6 → Model Deployment (Kubernetes + FastAPI)
+# Week 7 → Model Deployment + Monitoring(Kubernetes + FastAPI)
 
 ## Helper Scripts
 
@@ -17,7 +17,7 @@
   Python script that updates Kubernetes manifests and triggers deployment for the latest model version.
 
 - **deployment.yaml**  
-  Kubernetes manifest for deploying the model-serving FastAPI application (container image, replicas, and metadata).
+  Kubernetes manifest for deploying the model-serving FastAPI application (container image, replicas, and metadata) + new monitoring code.
 
 - **service.yaml**  
   Kubernetes manifest defining a LoadBalancer service to expose the model’s API externally.
@@ -26,4 +26,4 @@
   Builds the container image that serves the ML model through FastAPI.
 
 - **model_server.py**  
-  FastAPI application responsible for loading the trained model and serving inference requests.
+  FastAPI application responsible for loading the trained model and serving inference requests + added monitoring code for week 7 with new endpoints for monitoring.
