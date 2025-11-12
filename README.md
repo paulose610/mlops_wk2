@@ -1,4 +1,4 @@
-# Week 7 → Model Deployment + Monitoring(Kubernetes + FastAPI)
+# Week 7 → Model Deployment + Monitoring and Stress Testing(Kubernetes + FastAPI)
 
 ## Helper Scripts
 
@@ -28,5 +28,5 @@
 - **model_server.py**  
   FastAPI application responsible for loading the trained model and serving inference requests + added monitoring code for week 7 with new endpoints for monitoring.
 
--**post.lua**
+- **post.lua**
   file for stress testing.
