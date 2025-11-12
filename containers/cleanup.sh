@@ -7,8 +7,8 @@ REPO="iris-repo"
 IMAGE="iris-model"
 
 echo "🧹 Deleting Kubernetes deployments and services..."
-kubectl delete deployment -l app=iris-model --ignore-not-found
-kubectl delete svc -l app=iris-model --ignore-not-found
+kubectl get deployments -o name | grep iris-model | xargs -r kubectl delete --ignore-not-found
+kubectl get svc -o name | grep iris-model | xargs -r kubectl delete --ignore-not-found
 
 echo "🧹 Deleting all images from Artifact Registry..."
 gcloud artifacts docker images list $REGION-docker.pkg.dev/$PROJECT_ID/$REPO \
