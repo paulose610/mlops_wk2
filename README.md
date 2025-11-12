@@ -11,7 +11,7 @@
 ## Utility Files
 
 - **cd.yaml**  
-  Continuous Deployment configuration file used in the CI/CD pipeline for automated model rollout.
+  Continuous Deployment configuration file used in the CI/CD pipeline for automated model rollout + stress testing at the end of deployment.
 
 - **deploy_latest.py**  
   Python script that updates Kubernetes manifests and triggers deployment for the latest model version.
@@ -27,3 +27,6 @@
 
 - **model_server.py**  
   FastAPI application responsible for loading the trained model and serving inference requests + added monitoring code for week 7 with new endpoints for monitoring.
+
+-**post.lua**
+  file for stress testing.
