@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: iris-model-v${MODEL_VERSION}
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: iris-model
@@ -20,6 +20,36 @@ spec:
           image: us-central1-docker.pkg.dev/winged-quanta-472908-n1/iris-repo/iris-model:v${MODEL_VERSION}
           ports:
             - containerPort: 8200
+
+          # --- Health Probes (from professor’s example) ---
+          readinessProbe:
+            httpGet:
+              path: /ready_check
+              port: 8200
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 5
+
+          livenessProbe:
+            httpGet:
+              path: /live_check
+              port: 8200
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          # --- Resource requests/limits (required for HPA) ---
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          # --- Environment Variables (your original setup) ---
           env:
             - name: MODEL_NAME
               value: "${MODEL_NAME}"

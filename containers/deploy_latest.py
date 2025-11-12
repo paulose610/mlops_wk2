@@ -14,7 +14,7 @@ versions = client.search_model_versions(f"name='{MODEL_NAME}'")
 latest_version = max(versions, key=lambda v: int(v.version)).version
 print(f"Latest model version: {latest_version}")
 
-# --- 2. Build & push Docker image (bakes metadata here) ---
+# --- 2. Build & push Docker image ---
 tag = f"{IMAGE_BASE}:v{latest_version}"
 subprocess.run([
     "docker", "build",
@@ -26,16 +26,14 @@ subprocess.run([
 
 subprocess.run(["docker", "push", tag], check=True)
 
-# --- 3. Update & deploy Kubernetes manifest ---
-subprocess.run(
-    f"env MODEL_NAME={MODEL_NAME} MODEL_VERSION={latest_version} envsubst < deployment.yaml | kubectl apply -f -",
-    shell=True,
-    check=True
-)
-subprocess.run(
-    f"env MODEL_NAME={MODEL_NAME} MODEL_VERSION={latest_version} envsubst < service.yaml | kubectl apply -f -",
-    shell=True,
-    check=True
-)
+# --- 3. Deploy Kubernetes manifests ---
+for manifest in ["deployment.yaml", "service.yaml", "hpa.yaml"]:
+    print(f"Applying {manifest} ...")
+    subprocess.run(
+        f"env MODEL_NAME={MODEL_NAME} MODEL_VERSION={latest_version} envsubst < {manifest} | kubectl apply -f -",
+        shell=True,
+        check=True
+    )
 
-print(f"Deployed model {MODEL_NAME} version {latest_version} with image tag v{latest_version}")
+print(f"\n✅ Deployed model '{MODEL_NAME}' version {latest_version} with image tag v{latest_version}")
+print("✅ Deployment, Service, and HPA applied successfully.")

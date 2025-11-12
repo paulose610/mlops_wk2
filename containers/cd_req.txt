@@ -13,3 +13,6 @@ google-cloud-storage
 google-cloud-artifact-registry
 tqdm
 pyyaml
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-gcp-trace

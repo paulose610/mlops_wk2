@@ -9,5 +9,5 @@ spec:
     version: v${MODEL_VERSION}
   ports:
     - protocol: TCP
-      port: 8200
+      port: 80
       targetPort: 8200
