@@ -107,4 +107,4 @@ jobs:
         working-directory: ./benchmark
         run: |
           echo "🚀 Running stress test on http://$SERVICE_IP/predict"
-          wrk -t4 -c200 -d5m -s post.lua http://$SERVICE_IP/predict
+          wrk -t4 -c1000 -d5m -s post.lua http://$SERVICE_IP/predict
